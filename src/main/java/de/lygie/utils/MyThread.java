@@ -12,12 +12,10 @@ public class MyThread extends Thread{
 
     File[] listOfFiles;
     private static int chunksize = 100;
-    private static String url = "jdbc:mysql://localhost:3306/dsmetest";
 
-    public MyThread(File[] listOfFiles, int chunksize, String url){
+    public MyThread(File[] listOfFiles, int chunksize){
         this.listOfFiles = listOfFiles;
         this.chunksize = chunksize;
-        this.url = url;
     }
 
     @Override
@@ -27,7 +25,7 @@ public class MyThread extends Thread{
             if (null != file && file.isFile()) {
                 Sendung sendung = new Sendung();
                 try {
-                    sendung.importFile(file,chunksize,url);
+                    sendung.importFile(file,chunksize);
                 } catch (ParserConfigurationException e) {
                     throw new RuntimeException(e);
                 } catch (IOException e) {

@@ -1,15 +1,16 @@
 mvn clean compile assembly:single
 
-##Export
+## Export
 #!/bin/bash
 java -jar xml_test.jar export
 zip -r xml.zip /tmp/xml
 
+config.ini.example kopieren nach config.ini
 
 ## Import
-java -jar xml_test.jar import 10 jdbc:mysql://localhost:3306/dsmetest 6
+java -jar xml_test.jar import 
 
 
 Beispiel:
-java -jar xml_test.jar import 10 jdbc:mysql://localhost:3306/dsmetest 6
+java -jar xml_test.jar import 
 

@@ -1,0 +1,12 @@
+[general]
+folder = "/tmp/xml/"
+
+[export]
+testQuantity = 1000000
+
+[import]
+chunksize=100
+threads=4
+url=jdbc:mysql://localhost:3306/dsmetest
+username=<username>
+password=<password>

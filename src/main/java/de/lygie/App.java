@@ -3,12 +3,15 @@ package de.lygie;
 import de.lygie.model.Dsme;
 import de.lygie.model.Sendung;
 import de.lygie.model.Versicherungsnummer;
+import de.lygie.utils.Config;
 import de.lygie.utils.MyThread;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,29 +31,14 @@ import static java.lang.Math.ceil;
 public class App 
 {
 
-    private static int chunksize = 100;
-    private static int threads = 4;
-    private static String url = "jdbc:mysql://localhost:3306/dsmetest";
+    static Config config;
 
     public static void main( String[] args ) throws ParserConfigurationException, IOException, SAXException, SQLException {
 
+        config = new Config();
+
         String folder = new String("/tmp/xml/");
-        System.out.println("Aufruf war " + String.join(" ", args) + args.length + " Parameter");
-
-        if (args.length > 1 && Integer.parseInt(args[1])>0){
-            chunksize=Integer.parseInt(args[1]);
-            System.out.println("Chunksize ist " + chunksize);
-        }
-
-        if (args.length > 2){
-            url=args[2];
-            System.out.println("Url ist " + url);
-        }
-
-        if (args.length > 3){
-            threads=Integer.parseInt(args[3]);
-            System.out.println("threads ist " + threads);
-        }
+        System.out.println("Aufruf war " + String.join(" ", args) + " mit " + args.length + " Parameter");
 
         if (args.length > 0 && args[0].equals("import")){
             System.out.println("lese");
@@ -62,18 +50,19 @@ public class App
 
     }
 
+
     private static void readXML(String foldername) throws ParserConfigurationException, IOException, SAXException, SQLException {
         File folder = new File(foldername);
         File[] listOfFiles = folder.listFiles();
-        int groesse = (int) (listOfFiles.length / threads) + 1;
-        File[][] listOfFileForThread = new File[threads][groesse];
+        int groesse = (int) (listOfFiles.length / config.getThreads()) + 1;
+        File[][] listOfFileForThread = new File[config.getThreads()][groesse];
         List<MyThread> threadsToStart = new ArrayList<>();
-        int[] feldInTopf = new int[threads];
+        int[] feldInTopf = new int[config.getThreads()];
         int j = 0;
         int curlength;
         int topf;
         for (File file : listOfFiles) {
-            topf = j % threads;
+            topf = j % config.getThreads();
             listOfFileForThread[topf][feldInTopf[topf]]=file;
             feldInTopf[topf]++;
             j++;
@@ -84,7 +73,7 @@ public class App
 
 
         for (File[] workload : listOfFileForThread){
-                threadsToStart.add(new MyThread(workload, chunksize, url));
+                threadsToStart.add(new MyThread(workload, config.getChunksize()));
         }
         for (MyThread thread : threadsToStart){
             thread.start();
@@ -116,7 +105,7 @@ public class App
 
 
         Sendung sendung = new Sendung();
-        for (int i=0;i<=10000*100;i++){//1 millionen Datensaetze
+        for (int i=0;i<=config.getTestQuantity();i++){//1 millionen Datensaetze
             alle ++;
             Dsme dsme = generateDsme();
             sendung.addMeldung(dsme);
@@ -125,7 +114,7 @@ public class App
                 sendung = new Sendung();
             }
         }
-        System.out.println(alle + " Datensätze geschrieben in " + Math.round((System.currentTimeMillis() - t1)/1000) + " Sekunden");
+        System.out.println(alle-1 + " Datensätze geschrieben in " + Math.round((System.currentTimeMillis() - t1)/1000) + " Sekunden");
 
     }
 }

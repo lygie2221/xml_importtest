@@ -1,5 +1,6 @@
 package de.lygie.model;
 
+import de.lygie.utils.Config;
 import de.lygie.utils.MysqlConnection;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -16,10 +17,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -32,6 +30,7 @@ public class Sendung {
 
 
     private List<Dsme> meldungen = new ArrayList<>();
+    Config config;
 
 
     public void toXML(String filename) throws ParserConfigurationException {
@@ -79,14 +78,17 @@ public class Sendung {
 
     }
 
-    public void importFile(File file, int chunksize, String url) throws ParserConfigurationException, IOException, SAXException, SQLException {
+    public void importFile(File file, int chunksize) throws ParserConfigurationException, IOException, SAXException, SQLException {
+
+        config = new Config();
+
 
         long t1 = System.currentTimeMillis();
-        String username = "lygie";
-        String password = "lygie";
+        String username = config.getUsername();
+        String password = config.getPassword();
         Connection connection = null;
         try {
-            connection = DriverManager.getConnection(url, username, password);
+            connection = DriverManager.getConnection(config.getUrl(), username, password);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
