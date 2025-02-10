@@ -14,3 +14,6 @@ java -jar xml_test.jar import
 Beispiel:
 java -jar xml_test.jar import 
 
+## Screencast
+https://projekte.lygie.de/xml_performancetest.mp4
+https://projekte.lygie.de/xml_performancetest_threads.mp4
